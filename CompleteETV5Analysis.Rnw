@@ -1,0 +1,1024 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{verbatim}
+
+\title{Graph Complexity Analysis Identifies an ETV5 Tumor-Specific Network in Human and Murine Low-Grade Glioma}
+\author{Christina Duron, Jo Hardin, and Ami Radunskaya}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<warning=FALSE, message=FALSE, include=FALSE>>=
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+@
+
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+knitr::opts_chunk$set(echo = TRUE, fig.height = 3.5, size = "small", cache=TRUE)
+options(stringsAsFactors = FALSE, digits=3)
+
+require(tidyr) 
+require(ggplot2)
+require(scales)
+require(readr)
+require(dplyr)
+require(xtable)
+require(readxl)
+# source("https://bioconductor.org/biocLite.R")
+# biocLite("illuminaHumanv4.db")  # install Illumina database
+# biocLite("hgu133plus2.db")  # install Affymetrix database
+# biocLite("DESeq2")
+# biocLite("goseq")
+# biocLite("org.Mm.eg.db")
+require(illuminaHumanv4.db)
+require(hgu133plus2.db)
+require(DESeq2)
+library(gdata)
+library(Matrix)
+library(igraph)
+library(car)
+library(goseq)
+library(org.Mm.eg.db)
+library(GO.db)
+@
+
+<<>>=
+sessionInfo()
+@
+
+\section{Normalizing the Data}
+
+
+\subsection{Data}
+
+Data from Peter Sims, 5/21/16.  All columns have been included (data from previous analysis as well as newer samples).  We continue to us FF$\_$FMC$\_$matrixv2.xlx to get the REFSEQ$\_$ID gene information.
+
+\begin{itemize}
+\item C57 = C57 black 6 mice
+\item F18C = germline F18C mutation in NF1
+\item F21C = germline F21C mutation in NF1
+\item FF = flox/flox control, 3 month-old (control for all mutant mice except FMOC)
+\item FF$\_$6mo = flox/flox control, 6 month-old (control for FMOC mice)
+\item FMC$\_$carbo = Gfap-Cre NF1 mutant mice treated with carboplatin
+\item FMC = Gfap-Cre NF1 mutant mice
+\item FMC$\_$Min = Gfap-Cre NF1 mutant mice treated with minocycline
+\item FMC$\_$rapa = Gfap-Cre NF1 mutant mice treated with rapamycin
+\item FMOC = Olig2-Cre NF1 mutant mice
+\item FMPC = Gfap-Cre NF1/PTEN mutant mice
+\item FMPC$\_$NVP = Gfap-Cre NF1/PTEN mutant mice treated with NVP-BKM120
+\end{itemize}
+
+<<echo=TRUE, warning=FALSE, message=FALSE>>=
+micefinal <- read.delim("BTECfinal_cts.txt") 
+micefinal <- micefinal %>% dplyr::select(gene, dplyr::starts_with("FF_fe"), dplyr::starts_with("FF_ma"),
+                                  dplyr::starts_with("FMC_fe"), dplyr::starts_with("FMC_ma"))
+
+geneinfo <- read_excel("FF_FMC_matrixv2.xlsx", 
+                       col_names=c("gene", "REFSEQ_ID", paste("FF", 1:5, sep=""), 
+                                   paste("FMC",1:5, sep=""), "X", paste("FFk",1:5,sep=""), 
+                                   paste("FMCk",1:5,sep="")))
+geneinfo <- geneinfo %>% dplyr::select(gene, REFSEQ_ID)
+
+micefinal <- micefinal %>% dplyr::left_join(geneinfo, by="gene")
+@
+
+
+\subsection{DESeq2 Normalization}
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+cond <- factor(c(rep("FF", 4), rep("FMC", 11)))
+dds <- DESeq2::DESeqDataSetFromMatrix(micefinal[,-c(1,17)], DataFrame(cond), ~ cond)
+dds <- DESeq2::DESeq(dds, betaPrior=TRUE, fitType = "parametric")
+res <- results(dds)  # Diff Exp results if we want/need the p-values
+dds.data <- counts(dds, normalized=TRUE)
+miceout <- data.frame(gene=toupper(micefinal$gene), REFSEQ_ID=micefinal$REFSEQ_ID, dds.data)
+miceps <- data.frame(gene=toupper(micefinal$gene), REFSEQ_ID=micefinal$REFSEQ_ID, res)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Network Betweeness}
+
+\subsection{Cleaning the Data}
+We analyze the data taken from mice in both the normal and tumor groups. Note that the normal data contains only 4 data points, while the tumor data contains 11 data points. These results come from the code written in the R files miceDESeqnorm.R and FindBetweeness.R.
+
+After reading in the data and network, the gene names are converted to all uppercase to ease the analysis and the interactome network was set to be undirected.
+
+<< echo = TRUE, message=FALSE, warning=FALSE >>=
+network = read.table("gbm-sun-interactome.txt", header = TRUE,sep = "\t")
+
+# Read in data.  Use the file without all of the header stuff
+geodat = read.table("miceDESeqnorm.txt",header=TRUE,sep="\t")
+geodat = geodat[,-2]
+uppernames = toupper(geodat[,1]) # 
+geodat[,1] = uppernames
+rn <-geodat[,1]
+geodat <-geodat[,2:length(geodat[1,])]
+row.names(geodat)=rn
+
+
+# Split into normal and tumor
+tumor_data = geodat[,5:length(geodat[1,])] 
+norm_data = geodat[,1:4]
+
+library('igraph')
+ghuman = graph.data.frame(network[,1:2], directed = FALSE)
+ghuman = simplify(ghuman,remove.multiple=TRUE)
+
+
+## Complexity Analysis
+norm_zero_count <-as.matrix(apply(norm_data == 0, 1, sum)) # number of zeros in normal data
+tumor_zero_count <- as.matrix(apply(tumor_data == 0, 1, sum)) # number of zeros in tumor data
+
+@
+Some of the data points of the genes contained zeros, and so, those genes that contained a certain number of zeros in either the normal and tumor groups were removed. Genes that had more than 2 zeros in the normal data or more than 5 zeros in the tumor data. Note that if one gene had two 2 zeros in the normal data, but less than 5 zeros in the tumor data, it was still removed, and vice versa. Therefore, in order for the gene to remain, it has 3 or 4 normal nonzero data points or 6 to 11 tumor nonzero data points. 
+<< echo = TRUE >>=
+norm_data <- norm_data[norm_zero_count <= 2 & tumor_zero_count <= 5,] 
+tumor_data <- tumor_data[norm_zero_count <= 2 & tumor_zero_count <= 5,]
+@
+
+In addition, any genes that are not connected are removed from both networks. Upon simplifying the network and cleaning up the data, both the normal and tumor sets reduce from 23420 to 11055 genes. Note that each set contains the same 11055 genes.\\
+\newline
+In biological networks, measures of node centrality are useful in detecting genes with critical functional roles, as it can indicate which genes occupy critical positions in the network. What is deemed ``critical" determines which measure, or measures, one employs. \\
+
+\subsection{Betweeness}
+
+In the following analysis, the betweeness centrality is used to identify potential biologically meaningful genes, while other centrality measures - closeness, degree, and weighted node connectivity - are utilized for further validation.\\
+\newline
+The \textbf{betweenness centrality}, $b_i$, is a measurement of the number of shortest paths connecting any two nodes, $j$ and $k$, which pass through node $i$, where node $i$ can be thought of as a ``bridging" node in the network. It can be calculated as
+\begin{center}
+$b_i = \sum_{i \neq j \neq k} \frac{n_{j,k}(i)}{n_{j,k}}$
+\end{center}
+where $n_{j,k}$ is the total number of shortest paths connecting nodes $j$ and $k$, and $n_{j,k}(i)$ is the number of shortest paths that pass through node $i$. Note that the distance of each path, $d_{ij}$, is one minus the absolute value of the correlation coefficient between genes $i$ and $j$, where the correlation coefficient is taken to be the smaller value between the Spearman and Pearson coefficients. This measure quantifies the control of a node on the communication, or information flow, between other nodes, so nodes with large betweenness values are often called ``high traffic" nodes and can be thought of as "bottleneck" genes. The genes with subtantially larger betweenness values in the tumor set as compared to those in the normal set are discussed in this analysis.\\
+
+<<echo = TRUE, message = FALSE, warning = FALSE, cache=TRUE>>=
+source('FindBetweeness.R')
+
+## Betweeness
+miceDESeqComplex = FindBetweeness(norm_data, tumor_data, ghuman,0) # run for original 11 tumor samples
+
+# grab info from normal and tumor network (using original data of 4 normal and 11 tumor)
+
+NB <- as.matrix(V(miceDESeqComplex$normalg)$between) 
+rownames(NB) = as.matrix(V(miceDESeqComplex$normalg)$name)
+colnames(NB) = c('Normal Betweenness')
+
+NC <- as.matrix(V(miceDESeqComplex$normalg)$close) 
+rownames(NC) = as.matrix(V(miceDESeqComplex$normalg)$name)
+colnames(NC) = c('Normal Closeness')
+
+#----#
+
+TB <- as.matrix(V(miceDESeqComplex$tumorg)$between) 
+rownames(TB) = as.matrix(V(miceDESeqComplex$tumorg)$name)
+colnames(TB) = c('Tumor Betweenness')
+
+TC <- as.matrix(V(miceDESeqComplex$tumorg)$close) 
+rownames(TC) = as.matrix(V(miceDESeqComplex$tumorg)$name)
+colnames(TC) = c('Tumor Closeness')
+@
+
+Histograms of the betweeness are plotted in Figure 1. The left-hand plot is for the normal data and the right-hand plot is for the tumor data.
+
+<< echo = TRUE, fig.height = 4.5, fig.width = 8>>=
+par(mfrow=c(1,2))
+hist(NB, xlab = "Normal Betweenness", main = NA, breaks = 100)
+hist(TB, xlab = "Tumor Betweenness", main = NA, breaks = 100)
+@
+
+\begin{center}
+\small{Figure 1a and 1b (left to right): Histograms of the betweenness centrality values for the normal and tumor data. Both are drastically skewed right.}
+\end{center}
+
+Below are the summaries for the normal and tumor betweenness values.
+<< echo = TRUE >>=
+summary(NB)
+summary(TB)
+@
+The normal data has a much larger betweenness value than the tumor data. Out of 11055 genes, 7500 genes have a betweenness value of 0 in the normal data, and 2130 genes have that value in the tumor data. This implies that 67.8$\%$ and 19.3$\%$ of the genes in the normal and tumor data can be made in this network without the aid of any intermediary gene. Additionally, 75$\%$ of genes have a betweenness value less than 5598 and 3556 in the normal and tumor data. Therefore, only a few genes have betweenness value that tend towards the maximum values, which imply that these are the ``high-trafic" nodes in the network.
+
+
+Figure 1 is a plot of the normal versus tumor betweenness values.
+
+
+<< echo = TRUE, fig.height = 7, fig.width = 8>>=
+
+# creating a dataframe that has both expression & betweeness data
+# both sets have the same genes, so names should match up
+
+norm_central = cbind(NB) # grab betweeness
+tumor_central = cbind(TB) # grab betweeness for tumor
+centrality_data = cbind(norm_central, tumor_central) # hold betweeness for norm and tumor
+
+
+indx <- which(row.names(norm_data) %in% row.names(norm_central)) # grab indices of genes in both sets
+norm_avg <- as.matrix(rowMeans(norm_data[indx,])) # average the values across the row for each gene
+colnames(norm_avg) <- c('Normal Avg') 
+rownames(norm_avg) = row.names(norm_data)[indx]
+
+
+indx <- which(row.names(tumor_data) %in% row.names(tumor_central)) # grab indices of genes in both sets
+tumor_avg <- as.matrix(rowMeans(tumor_data[indx,])) # average the values across the row for each gene
+colnames(tumor_avg) <- c('Tumor Avg')
+rownames(tumor_avg) = row.names(tumor_data)[indx]
+
+
+# re-arrange to match the same gene order as the centrality data
+norm_avg  = as.matrix(norm_avg[row.names(centrality_data),])
+tumor_avg = as.matrix(tumor_avg[row.names(centrality_data),])
+colnames(norm_avg) <- c('Normal Avg')
+colnames(tumor_avg) <- c('Tumor Avg')
+
+
+# calculate fold-change values
+fc <- tumor_avg/norm_avg
+colnames(fc) <- c('FC Value')
+
+
+# calculate ratio of tumor to normal betweenness
+ratio_b <- as.matrix(centrality_data[,2]/centrality_data[,1]) 
+colnames(ratio_b) <- c('T_B/N_B')
+
+# store centrality measures, rpkm, and fc values in one place
+data_plot = cbind(centrality_data, norm_avg, tumor_avg, fc, ratio_b)
+
+# set threshold #1
+nb_thresh = 1000000
+tb_thresh = 1000000
+indx <- which(data_plot[,1] >= nb_thresh | data_plot[,2] >= tb_thresh) # grab genes who meet one of the cutoff marks
+data_thresh = as.matrix(data_plot[indx,]) # grab genes 
+
+
+# set threshold #2
+indx <- which(data_thresh[,6] >= 1.1) # grab indices of genes whose ratio is >= 2
+data_thresh = as.matrix(data_thresh[indx,]) # grab genes 
+
+tiff("Fig3.tiff", width = 6, height = 5, units = 'in', res = 800)
+plot(data_plot[,1], data_plot[,2], xlab = "Normal Betweenness", ylab = "Tumor Betweenness", col = 'black', pch = 1, xlim = c(0,18000000), ylim = c(0,5000000))
+par(new=TRUE)
+plot(data_thresh[,1], data_thresh[,2], xlab = "Normal Betweenness", ylab = "Tumor Betweenness", col = 'red', pch = 16,  main = NA, xlim = c(0,18000000), ylim = c(0,5000000))
+dev.off()
+
+jpeg("Fig3.jpeg", width = 6, height = 5, units = 'in', res = 800)
+plot(data_plot[,1], data_plot[,2], xlab = "Normal Betweenness", ylab = "Tumor Betweenness", col = 'black', pch = 1, xlim = c(0,18000000), ylim = c(0,5000000))
+par(new=TRUE)
+plot(data_thresh[,1], data_thresh[,2], xlab = "Normal Betweenness", ylab = "Tumor Betweenness", col = 'red', pch = 16,  main = NA, xlim = c(0,18000000), ylim = c(0,5000000))
+dev.off()
+
+indx = which(rownames(NC) %in% rownames(data_thresh))
+
+tiff("Fig4.tiff", width = 6, height = 5, units = 'in', res = 800)
+plot(NC[,1], TC[,1], xlab = "Normal Closeness", ylab = "Tumor Closeness", col = 'black', pch = 1, xlim = c(0,0.0025), ylim = c(0.00004,0.00016))
+par(new=TRUE)
+plot(NC[indx,1], TC[indx,1], xlab = "Normal Closeness", ylab = "Tumor Closeness", col = 'red', pch = 16,  main = NA, xlim = c(0,0.0025), ylim = c(0.00004,0.00016))
+dev.off()
+
+jpeg("Fig4.jpeg", width = 6, height = 5, units = 'in', res = 800)
+plot(NC[,1], TC[,1], xlab = "Normal Closeness", ylab = "Tumor Closeness", col = 'black', pch = 1, xlim = c(0,0.0025), ylim = c(0.00004,0.00016))
+par(new=TRUE)
+plot(NC[indx,1], TC[indx,1], xlab = "Normal Closeness", ylab = "Tumor Closeness", col = 'red', pch = 16,  main = NA, xlim = c(0,0.0025), ylim = c(0.00004,0.00016))
+dev.off()
+@
+\begin{figure}
+\includegraphics[scale=.1]{Fig3.jpeg}
+\caption{Betweenness plot of the genes.}
+\end{figure}
+
+\begin{figure}
+\includegraphics[scale=.1]{Fig4.jpeg}
+\caption{Closeness plot of the genes.}
+\end{figure}
+
+We are interested in the genes which have a betweenness ratio of 1.1:1, meaning its tumor betweenness value is at least 1.1 as big as its normal betweenness value. The genes we are concerned are colored red in Figure 3 and are
+<<echo = TRUE>>=
+row.names(data_thresh)
+@
+
+
+Those 23 genes are colored in red in the plots in Figure 1, which highlights the betweenness values of the normal and tumor sets. The same 23 genes are colored in red in Figure 2, which highlights the WNC values (I think WNC just means closeness, but I'm not sure...  ???) of the normal and tumor sets. Note that the scale in Figure 2 are adjusted by multiplying the WNC values by the standard error of each set, $\sqrt(4)$ for the normal data and $\sqrt(11)$ for the tumor data.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newpage
+\section{ETV5 Differential Expression}
+
+The goal of this analysis is to understand the differential expression of the genes which are {\em regulated} by genes identified in a previous analysis.  At this stage, we are using only one dataset:  Optic Glioma.  There are 4 normal mice samples and 11 tumor mice samples.
+
+
+\subsection{Previously identified genes}
+The process for identifying \textcolor{red}{regulator} genes is as follows:
+
+\begin{enumerate}
+\item
+Use interactome network as provided by Peter Sims (binary and directional relationships between 13089 genes).
+\item
+For the weights along the interactome network, use 1-abs(cor) for a dissimilarity metric (using expression data).  Find the new weighted network for each of the tumor and normal datasets.
+\item
+Extract a sub-network using genes which are highest according to the betweeness complexity measure.  For each dataset, there will be 2 sub-networks (one normal and one tumor).  [Be sure to intersect the genes in the two lists for an apples to apples comparison.]
+\item
+Compare normal and tumor sub-networks in each dataset.
+\end{enumerate}
+
+The genes which were identified as most promising are the following:  
+
+<<echo = TRUE>>=
+row.names(data_thresh)
+@
+
+\subsection{Finding target genes}
+
+As mentioned, the original interactome network from Peter Sims contains the relationships between genes.  For each of the regulators, we find the list of upstream genes.
+<<>>=
+possibleRegulators = row.names(data_thresh)
+@
+
+<<echo=TRUE>>=
+# Read in network.  
+intNet=read.table("gbm-sun-interactome.txt",header=TRUE,sep="\t")
+
+tarGenes = list()
+for(i in 1:length(possibleRegulators)){
+  tarGenes[[i]] = t(data.frame(lapply(intNet[intNet[,1]==possibleRegulators[i],2],as.character),
+                               stringsAsFactors = FALSE)) 
+ if(nrow(tarGenes[[i]]) > 0) {colnames(tarGenes[[i]]) = c("GENE")
+ tarGenes[[i]] = data.frame(tarGenes[[i]])}
+}
+names(tarGenes) = as.vector(possibleRegulators)
+@
+
+<<echo=TRUE, size='scriptsize'>>=
+# The number of target genes for each of the possible regulators:
+lapply(tarGenes,nrow)
+@
+
+<<echo=TRUE, eval=TRUE>>=
+# the number of genes described in the interactome network: 
+length(unique(intNet[,1]))  # number of unique regulators
+length(unique(intNet[,2]))  # number of unique targets
+length(unique(union(intNet[,1], intNet[,2]))) # number of unique transcriptomes total
+@
+
+For good measure, it is interesting to see which of the regulators are also differentially expressed.  (Only ETV5!  The genes are sorted based on the adjusted p-value.)
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+DEanalysis = miceps # the DE analysis from normalization above
+DEps = DEanalysis[,c("gene", "pvalue", "padj", "log2FoldChange")]
+DEps = DEps %>% mutate(GENE=gene) %>% dplyr::select(-gene)
+#head(DEps)
+
+regGenesP <- left_join(data.frame(GENE = possibleRegulators), DEps, by="GENE")
+regGenesP %>% arrange(padj)
+@
+
+\newpage
+\subsection*{DE for target genes}
+
+A DESeq anlaysis was done on the optic glioma dataset using DESeq2.  
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+
+tarGenesP = list()
+for(i in 1:length(possibleRegulators)){
+  temp = tarGenes[[i]]
+  if(nrow(temp) > 0) tarGenesP[[i]] <- left_join(temp, DEps, by= "GENE")
+  if(nrow(temp) == 0) tarGenesP[[i]] <- data.frame(GENE=NA, pvalue=NA, padj=NA, log2FoldChange=NA)
+}
+names(tarGenesP) = as.vector(possibleRegulators)
+
+siglevel = 0.01
+numsig = sapply(tarGenesP, function(x) sum(x$padj < siglevel, na.rm=T))
+totalps = sapply(tarGenesP, function(x) sum(!is.na(x$padj)))
+percsig = sapply(tarGenesP, function(x) sum(x$padj < siglevel, na.rm=T)) / sapply(tarGenesP, function(x) sum(!is.na(x$padj)))
+
+all = data.frame(numsig=sum(DEps$padj < siglevel, na.rm=T),
+                 totalps = sum(!is.na(DEps$padj)),
+                 percsig = sum(DEps$padj < siglevel, na.rm=T)/sum(!is.na(DEps$padj)))
+TargetPs = cbind(GENE=c(names(numsig),"ALL"),rbind(data.frame(numsig,totalps,percsig), all=all))
+@
+
+\subsubsection{Visualizing p-values}
+
+<<fig.width=6, fig.height=2.1>>=
+numReg = length(possibleRegulators)
+par(mfrow=c(1,2))
+hist(DEps$pvalue, main="all genes", xlab="raw p-value", ylab="Freq")
+hist(DEps$padj, main="all genes", xlab="adjusted p-value", ylab="Freq")
+
+# only printing for ETV5, uncomment to see all sig genes for all regulators
+# for(i in 1:numReg){
+#  if(sum(!is.na(tarGenesP[[i]]$pvalue)) > 0){
+#  hist(tarGenesP[[i]]$pvalue, main=possibleRegulators[i], xlab="raw p-value", ylab="Freq")
+#  hist(tarGenesP[[i]]$padj, main=possibleRegulators[i], xlab="adjusted p-value", ylab="Freq")}
+#}
+
+hist(tarGenesP["ETV5"]$ETV5$pvalue, main="ETV5", xlab="raw p-value", ylab="Freq")
+hist(tarGenesP["ETV5"]$ETV5$padj, main="ETV5", xlab="adjusted p-value", ylab="Freq")
+
+
+#prints summary of pvalues for all regulators of interest:
+#lapply(tarGenesP,function(x) summary(x[,-1]))
+
+#significance level is 0.01 (for adjusted p-value)
+#ordered by the percent of significant targets, ETV5 is highest
+TargetPs  %>% arrange(desc(percsig)) 
+@
+
+\vspace*{-.5cm}
+\subsubsection{Lists of Significant Genes}
+
+<<echo=TRUE>>=
+# only printing for ETV5, uncomment to see all sig genes for all regulators
+# lapply(tarGenesP, function(x) x[c(x$padj < siglevel & !is.na(x$padj)),])
+tarGenesP$ETV5[c(tarGenesP$ETV5$padj < siglevel & !is.na(tarGenesP$ETV5$padj)),]
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Public Data - Human}
+
+\subsection{Data}
+The following analysis is further investigation into ETV5 using two human datasets.  
+
+\subsubsection{GSE42656 Study}
+\url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42656}\\
+\url{http://cancerres.aacrjournals.org/content/73/18/5834.long#sec-2}\\
+Henriquez NV et al., ``Comparative expression analysis reveals lineage relationships between human and murine gliomas and a dominance of glial signatures during tumor propagation in vitro.'', {\bf Cancer Res}, 2013 Jul 25;73(18):5834-44\\
+
+
+{\bf From NCBI data repository} \\
+``We analysed gene expression in paediatric brain tumours as compared to normal adult brain in order to understand the molecular profiles. Our cohort included 14 pilocytic astrocytomas, 3 diffuse astrocytomas, 2 anaplastic astrocytomas, 5 glioblastomas, 14 ependymomas, 9 medulloblastomas, 5 atypical teratoid/rhabdoid tumours, 4 choroid plexus papillomas, 1 papillary glioneuronal, 8 adult brain and 8 foetal brain controls.''\\
+
+{\bf Article Abstract:}\\
+Brain tumors are thought to originate from stem/progenitor cell populations that acquire specific genetic mutations. Although current preclinical models have relevance to human pathogenesis, most do not recapitulate the histogenesis of the human disease. Recently, a large series of human gliomas and medulloblastomas were analyzed for genetic signatures of prognosis and therapeutic response. Using a mouse model system that generates three distinct types of intrinsic brain tumors, we correlated RNA and protein expression levels with human brain tumors. A combination of genetic mutations and cellular environment during tumor propagation defined the incidence and phenotype of intrinsic murine tumors. Importantly, in vitro passage of cancer stem cells uniformly promoted a glial expression profile in culture and in brain tumors. Gene expression profiling revealed that experimental gliomas corresponded to distinct subclasses of human glioblastoma, whereas experimental supratentorial primitive neuroectodermal tumors (sPNET) correspond to atypical teratoid/rhabdoid tumor (AT/RT), a rare childhood tumor.\\
+
+{\bf Methods:} Human samples using Ilumina arrays (Illumina HT12$\_$v3).
+
+
+
+\subsubsection{GSE12907 Study}
+
+Need to fill in the references / experimental design / methods for the GSE12907 dataset.
+
+This data set has 21 juvenile pilocytic astrocytoma samples (columns 2-22), three samples from normal cerebellum (from humans ages 8, 16 and 63, columns 23-25), and one normal foetal sample (column 26).  The first column contains the Probe IDs.
+
+
+\subsubsection{Data Wrangling of both datasets}
+
+<<echo=TRUE, include=TRUE, warning=FALSE, message=FALSE>>=
+#targets of ETV5 only
+tarGenesETV5 <- tarGenesP$ETV5
+
+# inputting the two human datasets
+GSE42656 <- read.delim("GSE42656_series_dataonly.txt", sep="\t")
+GSE12907 <- read.delim("GSE12907_series_dataonly.txt", sep="\t")
+ETV5name <- data.frame(GENE="ETV5")
+
+PROBES.GSE42656 <- as.character(GSE42656$ID_REF)  # Illumina
+PROBES.GSE12907 <- as.character(GSE12907$ID_REF)  # Affymetrix Human Genome U133A
+
+IlluminaIDs <- AnnotationDbi::select(illuminaHumanv4.db, PROBES.GSE42656, c("SYMBOL","PROBEID", "ENTREZID", "GENENAME"))
+AffyIDs <- AnnotationDbi::select(hgu133plus2.db, PROBES.GSE12907, c("SYMBOL","PROBEID", "ENTREZID", "GENENAME"))
+
+
+# cleaning up GSE42656
+pilocytic <- c("GSM1047395", "GSM1047396", "GSM1047397", "GSM1047399", "GSM1047400",
+               "GSM1047401", "GSM1047402", "GSM1047403", "GSM1047404", "GSM1047405",
+               "GSM1047406", "GSM1047407", "GSM1047408", "GSM1047409")
+
+foetal <- c("GSM1047452",	"GSM1047453",	"GSM1047454",	"GSM1047455",	"GSM1047456",
+            "GSM1047457",	"GSM1047458",	"GSM1047459")
+
+# ETV5_GSE42656 - FOETAL
+ETV5_GSE42656 <- GSE42656 %>%
+  dplyr::select(one_of(c("ID_REF", pilocytic, foetal))) %>%
+  left_join(IlluminaIDs, by = c("ID_REF" = "PROBEID")) %>%
+  right_join(ETV5name, by=c("SYMBOL"= "GENE")) %>%
+  dplyr::select(-ENTREZID, -GENENAME)
+
+ETV5_GSE42656_tidy <- ETV5_GSE42656 %>%
+  tidyr::gather(sampleID, expression, -c(ID_REF,SYMBOL)) %>%
+  mutate(expression = parse_number(expression)) %>%
+  mutate(sample = ifelse(sampleID %in% pilocytic, "pilocytic", "foetal"))
+
+
+AffyIDs <- AnnotationDbi::select(hgu133plus2.db, PROBES.GSE12907,  c("SYMBOL", "ENTREZID", "GENENAME"))
+
+CBM = colnames(GSE12907)[23:26]
+pilocytic12907 = colnames(GSE12907)[2:22]
+
+# ETV5_GSE12907 
+ETV5_GSE12907 <- GSE12907 %>%
+  left_join(AffyIDs, by = c("ID_REF" = "PROBEID")) %>%
+  right_join(ETV5name, by=c("SYMBOL"= "GENE")) %>%
+  dplyr::select(-ENTREZID, -GENENAME)
+
+ETV5_GSE12907_tidy <- ETV5_GSE12907 %>%
+  tidyr::gather(sampleID, expression, -c(ID_REF,SYMBOL)) %>%
+  mutate(expression = parse_number(expression)) %>%
+  mutate(sample = ifelse(sampleID %in% CBM, "CBM", "PA"))
+@
+
+
+
+\subsection{t-tests on ETV5 for both datasets}
+
+<<echo=TRUE, include=TRUE, warning=FALSE, message=FALSE>>=
+#ETV5_GSE42656
+for(i in 1:nrow(ETV5_GSE42656)){
+print(t.test(ETV5_GSE42656[i,2:15], ETV5_GSE42656[i,16:23]))
+}
+
+ETV5_GSE42656_tidy <- ETV5_GSE42656_tidy %>%
+  mutate(sample2 = ifelse(sample=="foetal", "control", "PA"))
+
+ggplot(ETV5_GSE42656_tidy, aes(y=expression, x=sample)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("GSE42656: pilocytic astrocytoma vs foetal (2 Illumina probes for ETV5)")
+
+ggplot(ETV5_GSE42656_tidy, aes(y=expression, x=sample2)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("pilocytic astrocytoma vs foetal controls (Illumina probes for ETV5)") +
+  scale_y_continuous(trans=log2_trans()) + xlab("")
+
+# ETV5_GSE12907 
+ETV5_GSE12907_t <- GSE12907 %>%
+  left_join(AffyIDs, by = c("ID_REF" = "PROBEID")) %>%
+  dplyr::select(-ENTREZID, -GENENAME)
+
+all_p_12907 <- as.numeric()
+for(i in 1:nrow(ETV5_GSE12907_t)){
+   all_p_12907[i] <- t.test(ETV5_GSE12907_t[i,2:22], ETV5_GSE12907_t[i,23:26])$p.value
+ }
+mean(all_p_12907 <= 0.05)
+length(all_p_12907)
+
+for(i in 1:nrow(ETV5_GSE12907)){
+print(t.test(ETV5_GSE12907[i,2:15], ETV5_GSE12907[i,23:26]))
+}
+
+ETV5_GSE12907_tidy <- ETV5_GSE12907_tidy %>%
+  mutate(sample2 = ifelse(sample=="CBM", "control", "PA"))
+
+ggplot(ETV5_GSE12907_tidy, aes(y=expression, x=sample)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("GSE12907: pilocytic astrocytoma vs healthy cerebellum (Affy probes for ETV5)")
+
+
+ggplot(ETV5_GSE12907_tidy, aes(y=expression, x=sample)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("GSE12907: pilocytic astrocytoma vs healthy cerebellum (Affy probes for ETV5)") +
+  scale_y_continuous(trans=log2_trans()) + xlab("")
+
+p1 <- ggplot(ETV5_GSE42656_tidy, aes(y=expression, x=sample2)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("PA vs foetal controls (Illumina probes for ETV5)") +
+  scale_y_continuous(trans=log2_trans()) + xlab("") + theme(axis.text=element_text(size=16))
+p2 <- ggplot(ETV5_GSE12907_tidy, aes(y=expression, x=sample2)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle("PA vs healthy cerebellum (Affy probes for ETV5)") +
+  scale_y_continuous(trans=log2_trans()) + xlab("") + theme(axis.text=element_text(size=16))
+multiplot(p1,p2,cols=2)
+
+
+@
+
+
+\subsection{t-tests on ETV5 {\it targets} for both datasets}
+
+\subsubsection{GSE42656}
+
+Using the 31 targets which were significant for the mouse data, we notice that the majority of the probes for those targets are significant using the human data as well.  Notice that 56.1\% of the 31 EVT5 target probes were significantly differentially expressed (not adjusted for multiple comparisons); 20/31 = 64.5\% of the ETV5 target genes were significantly differentially expressed.
+
+
+Listed are the significant gene/probes (20 of 31 of the mouse-signifcant targets were also signficant in the GSE42656 dataset).  For example, SPRY4 is significant for two of the four probes.
+
+<<warning=FALSE, message=FALSE, echo=TRUE>>=
+temp <- tarGenesETV5[c(tarGenesETV5$padj < siglevel & !is.na(tarGenesETV5$padj)),]
+ETV5_sig <- data.frame(GENE=as.character(temp$GENE))
+ETV5_targets <- data.frame(GENE=as.character(tarGenes$ETV5$GENE))
+
+
+# targets_GSE42656 - FOETAL
+targets_GSE42656 <- GSE42656 %>%
+  dplyr::select(one_of(c("ID_REF", pilocytic, foetal))) %>%
+  left_join(IlluminaIDs, by = c("ID_REF" = "PROBEID")) %>%
+  dplyr::mutate(SYMBOL = toupper(SYMBOL)) %>%
+  dplyr::filter(SYMBOL %in% ETV5_sig$GENE) %>%
+  dplyr::select(-ENTREZID, -GENENAME) %>%
+  dplyr::filter(!is.na(ID_REF)) 
+
+
+p_targ_GSE42656 <-data.frame(GENE=character(), PROBE=character(), 
+                             pvalue=double(), statistic=double())
+
+for(i in 1:nrow(targets_GSE42656)){
+ temp <- t.test(as.numeric(targets_GSE42656[i,2:15]), 
+                as.numeric(targets_GSE42656[i,16:23]))
+ temp2 <- data.frame(GENE = as.character(targets_GSE42656[i,24]),
+                     PROBE = as.character(targets_GSE42656[i,1]),
+                     pvalue = temp$p.value, 
+                     statistic = temp$statistic)
+ p_targ_GSE42656 <- p_targ_GSE42656 %>% bind_rows(temp2)
+}
+
+
+p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+#  filter(pvalue <= 0.05) %>%
+#  summarize(n_distinct(GENE))
+  summarize(proportion.05 = mean(pvalue <= 0.05))
+
+p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  ggplot(aes(x=pvalue)) + geom_histogram(binwidth = .05) +
+  geom_vline(xintercept = siglevel) +
+  ggtitle("GSE42656: All probes of the 31 targets significant in mouse data")
+
+
+#siglevel/nrow(targets_GSE42656)  # no p-value adustment
+p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  #summarize(unique_genes = n_distinct(GENE))
+  arrange(pvalue)
+
+p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  summarize(unique_genes = n_distinct(GENE))
+
+
+targets_GSE42656_tidy <- targets_GSE42656 %>%
+  tidyr::gather(sampleID, expression, -c(ID_REF,SYMBOL)) %>%
+  mutate(expression = parse_number(expression)) %>%
+  mutate(sample = ifelse(sampleID %in% pilocytic, "pilocytic", "foetal"))
+
+
+genename <- data.frame(GENE="SPRY4")
+onegene_GSE42656 <- GSE42656 %>%
+  dplyr::select(one_of(c("ID_REF", pilocytic, foetal))) %>%
+  left_join(IlluminaIDs, by = c("ID_REF" = "PROBEID")) %>%
+  mutate(SYMBOL = toupper(SYMBOL)) %>%
+  right_join(genename, by=c("SYMBOL"= "GENE")) %>%
+  dplyr::select(-ENTREZID, -GENENAME)
+
+for(i in 1:nrow(onegene_GSE42656)){
+  print(t.test(onegene_GSE42656[i,2:15], onegene_GSE42656[i,16:23]))
+}
+
+targets_GSE42656_tidy %>%
+  filter(SYMBOL %in% genename) %>%
+  ggplot(aes(y=expression, x=sample)) + 
+  geom_boxplot() + facet_grid(.~ID_REF) +
+  ggtitle(paste("GSE42656, Gene:",genename))
+@
+
+\subsubsection{GSE12907}
+
+Using the 31 targets which were significant for the mouse data, we notice that the majority of the probes for those targets are significant using the human data as well.  Notice that 40.8\% of the 31 EVT5 target probes (49 probes) were significantly differentially expressed (not adjusted for multiple comparisons); 12/31 = 38.7\% of the ETV5 target genes were significantly differentially expressed.
+
+
+Listed are the significant gene/probes (12 of 31 of the mouse-signifcant targets were also signficant in the human dataset).  
+
+<<warning=FALSE, message=FALSE, echo=TRUE>>=
+# targets_GSE12907
+targets_GSE12907 <- GSE12907 %>%
+  dplyr::select(one_of(c("ID_REF", pilocytic12907, CBM))) %>%
+  left_join(AffyIDs, by = c("ID_REF" = "PROBEID")) %>%
+  mutate(SYMBOL = toupper(SYMBOL)) %>%
+  filter(SYMBOL %in% ETV5_targets$GENE) %>%
+  dplyr::select(-ENTREZID, -GENENAME) %>%
+  filter(!is.na(ID_REF)) 
+
+p_targ_GSE12907 <-data.frame(GENE=character(), PROBE=character(), 
+                             pvalue=double(), statistic=double())
+
+for(i in 1:nrow(targets_GSE12907)){
+ temp <- t.test(targets_GSE12907[i,2:22], targets_GSE12907[i,23:26])
+ temp2 <- data.frame(GENE = as.character(targets_GSE12907[i,27]),
+                     PROBE = as.character(targets_GSE12907[i,1]),
+                     pvalue = temp$p.value, 
+                     statistic = temp$statistic)
+ p_targ_GSE12907 <- p_targ_GSE12907 %>% bind_rows(temp2)
+}
+
+
+p_targ_GSE12907 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  summarize(proportion.05 = mean(pvalue <= 0.05))
+
+#siglevel/nrow(targets_GSE12907)  # no p-value adustment
+p_targ_GSE12907 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  arrange(pvalue)
+
+p_targ_GSE12907 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  summarize(unique_genes = n_distinct(GENE))
+
+
+p_targ_GSE12907 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  ggplot(aes(x=pvalue)) + geom_histogram(binwidth = .05) +
+  geom_vline(xintercept = siglevel) +
+  ggtitle("GSE12907: All probes of the 31 targets significant in mouse data")
+@
+
+\subsubsection{Comparing directionality of DE changes}
+<<warning=FALSE, message=FALSE, echo=TRUE>>=
+tarGenes31 <- lapply(tarGenesP, 
+                     function(x) x[c(x$padj < siglevel & !is.na(x$padj)),])$ETV %>%
+  arrange(padj)
+
+p_sig31_GSE12907 <- p_targ_GSE12907 %>%
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <=0.05)
+
+p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  full_join(p_sig31_GSE12907, by="GENE") %>%
+  full_join(tarGenes31, by="GENE") %>%
+  mutate(changemouse = ifelse(log2FoldChange > 0, "up", "down")) %>%
+  mutate(change42656 = ifelse(statistic.x > 0, "up", "down")) %>%
+  mutate(change12907 = ifelse(statistic.y > 0, "up", "down")) %>%
+  mutate(pmouse = padj, p42656 = pvalue.x, p12907 = pvalue.y) %>%
+  dplyr::select(GENE, changemouse, pmouse,change12907, p12907, change42656, p42656) %>%
+  arrange(GENE)
+
+
+best_targets <- p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  full_join(p_sig31_GSE12907, by="GENE") %>%
+  full_join(tarGenes31, by="GENE") %>%
+  mutate(changemouse = ifelse(log2FoldChange > 0, "up", "down")) %>%
+  mutate(change42656 = ifelse(statistic.x > 0, "up", "down")) %>%
+  mutate(change12907 = ifelse(statistic.y > 0, "up", "down")) %>%
+  mutate(pmouse = padj, p42656 = pvalue.x, p12907 = pvalue.y) %>%
+  dplyr::select(GENE, changemouse, change12907, change42656) %>%
+  filter(changemouse == change12907 | changemouse == change42656) %>%
+  distinct() %>%
+  arrange(GENE)
+
+
+best_targets
+
+xtable(best_targets)
+@
+
+\subsubsection{Note:}
+
+To confirm that the data human datasets were appropriate to use in comparison to the mouse data, we did a few analyses.  We first checked that the data were normalized, indeed, quantile normalization was used with GSE42656.  Additionally, to scale the differential expression, we looked at the global differential expression rates.  In GSE42656, of all the probes, approximately 1/3 were differentially expressed;  of the probes associated with the 31 signficant ETV5 target genes, more than half were differentially expressed in the human data.  In GSE12907, of all the probes, approximately 24\% were differentially expressed;  of the probes associated with the 31 signficant ETV5 target genes, 41\% were differentially expressed.
+
+\subsection{GO Analysis, GSE42656 only}
+
+Below are the top categories for the 31 targets which are differentially expressed.  The category ``negative regulation of response to stimulus''  is over-represented in our 31 genes (with 12 of 31 being involved in the category).
+
+
+<<warning=FALSE, message=FALSE, echo=TRUE>>=
+assayed.genes <- DEanalysis$gene
+de.genes <- ETV5_sig$GENE
+target.genes <- ETV5_targets$GENE
+
+gene.vector=as.integer(assayed.genes%in%de.genes)
+names(gene.vector)=assayed.genes 
+
+de.pwf = nullp(gene.vector, genome='mm9', id='geneSymbol', plot.fit=FALSE)  #prob weighting function
+
+gopvals = goseq(de.pwf, genome='mm9', id='geneSymbol', test.cats=c("GO:BP"))
+gopvals[p.adjust(gopvals$over_represented_pvalue, method = "BH") < 0.05,]
+
+xtable(gopvals[p.adjust(gopvals$over_represented_pvalue, method = "BH") < 0.05,c(1,6)])
+
+enriched.GO = gopvals$category[p.adjust(gopvals$over_represented_pvalue, method = "BH") < 0.05]
+
+## To find what the GO categories are:  
+for (go in enriched.GO){
+  print(GOTERM[[go]])
+  cat("----------------------------------------------\n")
+  }
+@
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{New Mouse Data}
+
+On November 22, 2016, Peter Sims gave us additional data.  The additional data consist of three 6-week FF and three 6-week FMC mouse optic nerve RNA-seq samples.  We will use the observations to identify if ETV5 is still significant and also to see if the same targets are differentially expressed (and in what direction).
+
+\subsection{Normalizing and DE for young data}
+
+<<echo=TRUE, warning=FALSE, message=FALSE>>=
+micefinalyoung <- read.delim("FF6wks_FMC6wks.cts.txt")
+colnames(micefinalyoung) <- c("gene", paste("FFY", 1:3, sep=""),
+                              paste("FMCY", 1:3, sep=""))
+
+geneinfo <- read_excel("FF_FMC_matrixv2.xlsx", 
+                       col_names=c("gene", "REFSEQ_ID", paste("FF", 1:5, sep=""), 
+                                   paste("FMC",1:5, sep=""), "X", paste("FFk",1:5,sep=""), 
+                                   paste("FMCk",1:5,sep="")))
+geneinfo <- geneinfo %>% dplyr::select(gene, REFSEQ_ID)
+
+micefinalyoung <- micefinalyoung %>% left_join(geneinfo, by="gene")
+
+condyoung <- factor(c(rep("FFY", 3), rep("FMCY", 3)))
+ddsyoung <- DESeq2::DESeqDataSetFromMatrix(micefinalyoung[,-c(1,8)], 
+                                           DataFrame(condyoung), ~ condyoung)
+ddsyoung <- DESeq2::DESeq(ddsyoung)
+resyoung <- results(ddsyoung)  # Diff Exp results if we want/need the p-values
+dds.datayoung <- counts(ddsyoung, normalized=TRUE)
+miceoutyoung <- data.frame(gene=toupper(micefinalyoung$gene), 
+                           REFSEQ_ID=micefinalyoung$REFSEQ_ID, dds.datayoung)
+micepsyoung <- data.frame(gene=toupper(micefinalyoung$gene), 
+                          REFSEQ_ID=micefinalyoung$REFSEQ_ID, resyoung)
+@
+
+\subsection{Significance of ETV5 and its targets}
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+
+# the 504 target genes of ETV5 with the ORIGINAL DE p-values
+ETV5andtargets <- data.frame(GENE = c("ETV5", tarGenesETV5[,1]))
+head(tarGenesETV5)
+
+# now investigating the new p-values with the 6-week mice data
+DEpsyoung = micepsyoung[,c("gene", "pvalue", "padj", "log2FoldChange")]
+DEpsyoung = DEpsyoung %>% mutate(GENE=gene) %>% dplyr::select(-gene)
+
+micefinalyoung %>% filter(gene == "Etv5") # raw data
+miceoutyoung %>% filter(gene == "ETV5") # normalized data
+DEpsyoung %>% filter(GENE == "ETV5") # DE results
+
+norm6wkdata <- miceoutyoung %>% filter(gene == "ETV5") %>% dplyr::select(starts_with("F")) 
+
+normdataplot <- data.frame(data6wk = unlist(norm6wkdata), sample=c(rep("FFY",3), rep("FMCY",3)))
+
+normdataplot <- normdataplot %>%
+  mutate(sample2 = ifelse(sample == "FFY", "control optic nerve", "optic glioma-bearing nerve")) %>%
+  mutate(labelpos = ifelse(normdataplot$sample=='FMCY',
+                          ifelse(normdataplot$data6wk < 262.2, -2, ifelse(normdataplot$data6wk < 265, 2, 0)),0))
+
+ggplot(normdataplot, aes(x=sample2, y=as.numeric(data6wk), 
+                         label=round(as.numeric(data6wk),2), shape=sample2)) +
+       ylab("normalized expression count") +
+       xlab("") + theme(axis.text=element_text(size=16)) +
+       geom_point(size=10)  + theme(legend.position="none") + 
+  scale_shape_manual(values=c(10,12))+
+  geom_text(nudge_y=normdataplot$labelpos, nudge_x=0.15, size=6) +
+  ggtitle("ETV5 expression in 6-week old mice")
+
+# the first 10 of all 504 targets of ETV5
+left_join(ETV5andtargets, DEpsyoung, by= "GENE") %>%
+  arrange(padj) %>%
+  head(10)
+
+# the 31 targets which were DE in the original data
+left_join(ETV5andtargets, DEpsyoung, by= "GENE") %>%
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  arrange(padj)
+
+left_join(ETV5andtargets, DEpsyoung, by= "GENE") %>%
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  arrange(padj) %>% 
+  ggplot(aes(x=pvalue)) +
+  geom_histogram(binwidth=0.05) +
+  geom_vline(xintercept=siglevel) +
+  ggtitle("6 week mouse data: All 31 targets significant in mouse data")
+
+@
+
+\subsubsection{Adding the young data to up/down comparison}
+
+<<echo=TRUE, message=FALSE, warning=FALSE>>=
+
+best_targets <- p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  filter(pvalue <= 0.05)  %>%
+  full_join(p_sig31_GSE12907, by="GENE") %>%
+  full_join(tarGenes31, by="GENE") %>%
+  full_join(DEpsyoung, by="GENE") %>%
+  mutate(changemouse = ifelse(log2FoldChange.x > 0, "up", "down")) %>%
+  mutate(changeyoung = ifelse(log2FoldChange.y > 0, "up", "down")) %>%
+  mutate(change42656 = ifelse(statistic.x > 0, "up", "down")) %>%
+  mutate(change12907 = ifelse(statistic.y > 0, "up", "down")) %>%
+  mutate(pmouse = padj.x, pyoung = padj.y, p42656 = pvalue.x, p12907 = pvalue.y) %>%
+  dplyr::select(GENE, changemouse, changeyoung, change12907, change42656) %>%
+  filter(changemouse == change12907 | changemouse == change42656) %>%
+  distinct() %>%
+  arrange(GENE)
+
+
+best_targets
+@
+
+\subsection{Figure 7}
+
+<<>>=
+#install.packages("gridExtra")
+library("gridExtra")
+
+hist1 <- p_targ_GSE42656 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  ggplot(aes(x=pvalue)) + geom_histogram(binwidth = .05) +
+  geom_vline(xintercept = siglevel) + xlim(c(-0.05,1)) + ylim(c(0,35)) +
+  theme(text = element_text(size = 15)) +
+  ggtitle("Pediatric PA: 57 Illumina probes of the 31 targets significant in mouse data")
+  
+hist2 <- p_targ_GSE12907 %>% 
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  ggplot(aes(x=pvalue)) + geom_histogram(binwidth = .05) +
+  geom_vline(xintercept = siglevel) + xlim(c(-.05,1)) + ylim(c(0,35)) + 
+  theme(text = element_text(size = 15)) +
+  ggtitle("Pediatric PA: 49 Affymetrix probes of the 31 targets significant in mouse data")
+  
+
+tempdata <- left_join(ETV5andtargets, DEpsyoung, by= "GENE") %>%
+  filter(GENE %in% ETV5_sig$GENE) %>%
+  arrange(padj)
+  
+hist3 <-  ggplot(tempdata, aes(x=pvalue)) +
+  geom_histogram(binwidth=0.05) +
+  geom_vline(xintercept=siglevel) +xlim(c(-0.05,1)) + ylim(c(0,35)) + 
+  theme(text = element_text(size = 15)) +
+  ggtitle("6 week mouse: RNA Seq on the 31 targets significant in mouse data")  
+  
+multiplot(hist1, hist2, hist3, cols=1)  
+
+@
+  
+\end{document}

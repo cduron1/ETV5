@@ -1,0 +1,705 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  23 JAN 2018 05:16
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**CompleteETV5Analysis.tex
+(./CompleteETV5Analysis.tex
+LaTeX2e <2017-04-15>
+Babel <3.10> and hyphenation patterns for 84 language(s) loaded.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/04/14 v1.1b Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2017/01/12 v0.06k Graphics/color for pdfTeX
+
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count87
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 147.
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip43
+\fb@frw=\dimen105
+\fb@frh=\dimen106
+\FrameRule=\dimen107
+\FrameSep=\dimen108
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/alltt.sty
+Package: alltt 1997/06/16 v2.0g defines alltt environment
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip44
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip10
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/tools/verbatim.sty
+Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks15
+\verbatim@line=\toks16
+\verbatim@in@stream=\read1
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+)
+(./CompleteETV5Analysis.aux)
+\openout1 = `CompleteETV5Analysis.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+
+(/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count88
+\scratchdimen=\dimen109
+\scratchbox=\box26
+\nofMPsegments=\count89
+\nofMParguments=\count90
+\everyMPshowfont=\toks17
+\MPscratchCnt=\count91
+\MPscratchDim=\dimen110
+\MPnumerator=\count92
+\makeMPintoPDFobject=\count93
+\everyMPtoPDFconversion=\toks18
+) (/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2017/03/19 v0.25 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+))
+(/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 63.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 63.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 63.
+Package color Info: Redefining color shadecolor on input line 74.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 76.
+Package color Info: Redefining color shadecolor on input line 107.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <9> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 109.
+
+[1
+
+{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Underfull \vbox (badness 10000) detected at line 190
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 190
+ []
+
+[2]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 198.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 198.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 201.
+
+ (/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 201.
+Package color Info: Redefining color shadecolor on input line 216.
+
+Overfull \hbox (21.63927pt too wide) in paragraph at lines 219--219
+[][]\OT1/cmtt/m/n/9 micefinal[] []<-[] []micefinal[] []%>%[] []dplyr[][]::[][]s
+elect[][](gene, dplyr[][]::[][]starts_with[][]([][]"FF_fe"[][]), dplyr[][]::[][
+]starts_with[][]([][]"FF_ma"[][]),[][] 
+ []
+
+Package color Info: Redefining color shadecolor on input line 237.
+[3] [4]
+Package color Info: Redefining color shadecolor on input line 264.
+LaTeX Font Info:    Try loading font information for OMS+cmtt on input line 266
+.
+
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/omscmtt.fd
+File: omscmtt.fd 
+)
+LaTeX Font Info:    Font shape `OMS/cmtt/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 266.
+Package color Info: Redefining color shadecolor on input line 295.
+
+Underfull \hbox (badness 10000) in paragraph at lines 303--306
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 303--306
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 309--312
+
+ []
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 315--316
+
+ []
+
+Package color Info: Redefining color shadecolor on input line 318.
+
+Overfull \hbox (13.75241pt too wide) in paragraph at lines 323--323
+[][]\OT1/cmtt/m/n/9 miceDESeqComplex[] []=[] []FindBetweeness[][](norm_data, tu
+mor_data, ghuman,[][]0[][])[] []\OT1/cmtt/m/it/9 # run for original 11 tumor sa
+mples[][] 
+ []
+
+Package color Info: Redefining color shadecolor on input line 351.
+<figure/unnamed-chunk-9-1.pdf, id=27, 578.16pt x 325.215pt>
+File: figure/unnamed-chunk-9-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-9-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-9-1.pdf used on input line 358.
+(pdftex.def)             Requested size: 469.75502pt x 264.23653pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 358--359
+[][] 
+ []
+
+[6]
+Package color Info: Redefining color shadecolor on input line 368.
+Package color Info: Redefining color shadecolor on input line 402.
+ [7 <./figure/unnamed-chunk-9-1.pdf>]
+Overfull \hbox (9.02748pt too wide) in paragraph at lines 412--412
+[][]\OT1/cmtt/m/n/9 indx[] []<-[] []which[][]([][]row.names[][](norm_data)[] []
+%in%[] []row.names[][](norm_central))[] []\OT1/cmtt/m/it/9 # grab indices of ge
+nes in both sets[][] 
+ []
+
+
+Overfull \hbox (18.47737pt too wide) in paragraph at lines 418--418
+[][]\OT1/cmtt/m/n/9 indx[] []<-[] []which[][]([][]row.names[][](tumor_data)[] [
+]%in%[] []row.names[][](tumor_central))[] []\OT1/cmtt/m/it/9 # grab indices of 
+genes in both sets[][] 
+ []
+
+
+Overfull \hbox (9.02768pt too wide) in paragraph at lines 419--419
+[][]\OT1/cmtt/m/n/9 tumor_avg[] []<-[] []as.matrix[][]([][]rowMeans[][](tumor_d
+ata[indx,]))[] []\OT1/cmtt/m/it/9 # average the values across the row for each 
+gene[][] 
+ []
+
+
+Overfull \hbox (79.9018pt too wide) in paragraph at lines 446--446
+[][]\OT1/cmtt/m/n/9 indx[] []<-[] []which[][](data_plot[,[][]1[][]][] []>=[] []
+nb_thresh[] []|[] []data_plot[,[][]2[][]][] []>=[] []tb_thresh)[] []\OT1/cmtt/m
+/it/9 # grab genes who meet one of the cutoff marks[][] 
+ []
+
+
+Overfull \hbox (276.7863pt too wide) in paragraph at lines 455--455
+[][]\OT1/cmtt/m/n/9 plot[][](data_plot[,[][]1[][]], data_plot[,[][]2[][]],[] []
+xlab[] []=[] []"Normal Betweenness"[][],[] []ylab[] []=[] []"Tumor Betweenness"
+[][],[] []col[] []=[] []^^Mblack^^M[][],[] []pch[] []=[] []1[][],[] []xlim[] []
+=[] []c[][]([][]0[][],[][]18000000[][]),[] []ylim[] []=[] []c[][]([][]0[][],[][
+]5000000[][]))[][] 
+ []
+
+
+Overfull \hbox (347.66048pt too wide) in paragraph at lines 457--457
+[][]\OT1/cmtt/m/n/9 plot[][](data_thresh[,[][]1[][]], data_thresh[,[][]2[][]],[
+] []xlab[] []=[] []"Normal Betweenness"[][],[] []ylab[] []=[] []"Tumor Betweenn
+ess"[][],[] []col[] []=[] []^^Mred^^M[][],[] []pch[] []=[] []16[][],[]  []main[
+] []=[] []NA[][],[] []xlim[] []=[] []c[][]([][]0[][],[][]18000000[][]),[] []yli
+m[] []=[] []c[][]([][]0[][],[][]5000000[][]))[][] 
+ []
+
+
+Overfull \hbox (276.7863pt too wide) in paragraph at lines 466--466
+[][]\OT1/cmtt/m/n/9 plot[][](data_plot[,[][]1[][]], data_plot[,[][]2[][]],[] []
+xlab[] []=[] []"Normal Betweenness"[][],[] []ylab[] []=[] []"Tumor Betweenness"
+[][],[] []col[] []=[] []^^Mblack^^M[][],[] []pch[] []=[] []1[][],[] []xlim[] []
+=[] []c[][]([][]0[][],[][]18000000[][]),[] []ylim[] []=[] []c[][]([][]0[][],[][
+]5000000[][]))[][] 
+ []
+
+
+Overfull \hbox (347.66048pt too wide) in paragraph at lines 468--468
+[][]\OT1/cmtt/m/n/9 plot[][](data_thresh[,[][]1[][]], data_thresh[,[][]2[][]],[
+] []xlab[] []=[] []"Normal Betweenness"[][],[] []ylab[] []=[] []"Tumor Betweenn
+ess"[][],[] []col[] []=[] []^^Mred^^M[][],[] []pch[] []=[] []16[][],[]  []main[
+] []=[] []NA[][],[] []xlim[] []=[] []c[][]([][]0[][],[][]18000000[][]),[] []yli
+m[] []=[] []c[][]([][]0[][],[][]5000000[][]))[][] 
+ []
+
+
+Overfull \hbox (210.63707pt too wide) in paragraph at lines 479--479
+[][]\OT1/cmtt/m/n/9 plot[][](NC[,[][]1[][]], TC[,[][]1[][]],[] []xlab[] []=[] [
+]"Normal Closeness"[][],[] []ylab[] []=[] []"Tumor Closeness"[][],[] []col[] []
+=[] []^^Mblack^^M[][],[] []pch[] []=[] []1[][],[] []xlim[] []=[] []c[][]([][]0[
+][],[][]0.0025[][]),[] []ylim[] []=[] []c[][]([][]0.00004[][],[][]0.00016[][]))
+[][] 
+ []
+
+
+Overfull \hbox (300.41103pt too wide) in paragraph at lines 481--481
+[][]\OT1/cmtt/m/n/9 plot[][](NC[indx,[][]1[][]], TC[indx,[][]1[][]],[] []xlab[]
+ []=[] []"Normal Closeness"[][],[] []ylab[] []=[] []"Tumor Closeness"[][],[] []
+col[] []=[] []^^Mred^^M[][],[] []pch[] []=[] []16[][],[]  []main[] []=[] []NA[]
+[],[] []xlim[] []=[] []c[][]([][]0[][],[][]0.0025[][]),[] []ylim[] []=[] []c[][
+]([][]0.00004[][],[][]0.00016[][]))[][] 
+ []
+
+
+Overfull \hbox (210.63707pt too wide) in paragraph at lines 490--490
+[][]\OT1/cmtt/m/n/9 plot[][](NC[,[][]1[][]], TC[,[][]1[][]],[] []xlab[] []=[] [
+]"Normal Closeness"[][],[] []ylab[] []=[] []"Tumor Closeness"[][],[] []col[] []
+=[] []^^Mblack^^M[][],[] []pch[] []=[] []1[][],[] []xlim[] []=[] []c[][]([][]0[
+][],[][]0.0025[][]),[] []ylim[] []=[] []c[][]([][]0.00004[][],[][]0.00016[][]))
+[][] 
+ []
+
+
+Overfull \hbox (300.41103pt too wide) in paragraph at lines 492--492
+[][]\OT1/cmtt/m/n/9 plot[][](NC[indx,[][]1[][]], TC[indx,[][]1[][]],[] []xlab[]
+ []=[] []"Normal Closeness"[][],[] []ylab[] []=[] []"Tumor Closeness"[][],[] []
+col[] []=[] []^^Mred^^M[][],[] []pch[] []=[] []16[][],[]  []main[] []=[] []NA[]
+[],[] []xlim[] []=[] []c[][]([][]0[][],[][]0.0025[][]),[] []ylim[] []=[] []c[][
+]([][]0.00004[][],[][]0.00016[][]))[][] 
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 499
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 499
+ []
+
+[8] <Fig3.jpeg, id=51, 4818.0pt x 4015.0pt>
+File: Fig3.jpeg Graphic file (type jpg)
+ <use Fig3.jpeg>
+Package pdftex.def Info: Fig3.jpeg used on input line 502.
+(pdftex.def)             Requested size: 481.82823pt x 401.52353pt.
+
+Overfull \hbox (12.07321pt too wide) in paragraph at lines 502--503
+[][] 
+ []
+
+<Fig4.jpeg, id=52, 4818.0pt x 4015.0pt>
+File: Fig4.jpeg Graphic file (type jpg)
+ <use Fig4.jpeg>
+Package pdftex.def Info: Fig4.jpeg used on input line 507.
+(pdftex.def)             Requested size: 481.82823pt x 401.52353pt.
+
+Overfull \hbox (12.07321pt too wide) in paragraph at lines 507--508
+[][] 
+ []
+
+Package color Info: Redefining color shadecolor on input line 513.
+[9] [10 <./Fig3.jpeg>] [11 <./Fig4.jpeg>]
+Package color Info: Redefining color shadecolor on input line 559.
+Package color Info: Redefining color shadecolor on input line 576.
+Package color Info: Redefining color shadecolor on input line 584.
+Package color Info: Redefining color shadecolor on input line 602.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <7> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 605.
+ [12]
+Package color Info: Redefining color shadecolor on input line 681.
+ [13]
+Package color Info: Redefining color shadecolor on input line 707.
+ [14]
+Package color Info: Redefining color shadecolor on input line 752.
+
+Overfull \hbox (120.86311pt too wide) in paragraph at lines 765--765
+[][]\OT1/cmtt/m/n/9 percsig[] []=[] []sapply[][](tarGenesP,[] []function[][]([]
+[]x[][])[] []sum[][](x[][]$[][]padj[] []<[] []siglevel,[] []na.rm[][]=T))[] []/
+[] []sapply[][](tarGenesP,[] []function[][]([][]x[][])[] []sum[][]([][]![][]is.
+na[][](x[][]$[][]padj)))[][] 
+ []
+
+Package color Info: Redefining color shadecolor on input line 778.
+<figure/unnamed-chunk-20-1.pdf, id=74, 433.62pt x 151.56625pt>
+File: figure/unnamed-chunk-20-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-20-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-20-1.pdf used on input line 786.
+(pdftex.def)             Requested size: 433.61894pt x 151.5728pt.
+LaTeX Font Info:    Font shape `OMS/cmtt/m/it' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 789.
+
+<figure/unnamed-chunk-20-2.pdf, id=75, 433.62pt x 151.56625pt>
+File: figure/unnamed-chunk-20-2.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-20-2.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-20-2.pdf used on input line 799.
+(pdftex.def)             Requested size: 433.61894pt x 151.5728pt.
+ [15 <./figure/unnamed-chunk-20-1.pdf>]
+Package color Info: Redefining color shadecolor on input line 842.
+
+[16 <./figure/unnamed-chunk-20-2.pdf>] [17]
+Underfull \hbox (badness 10000) in paragraph at lines 897--900
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 902--904
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 905--907
+
+ []
+
+Package color Info: Redefining color shadecolor on input line 922.
+
+Overfull \hbox (97.23839pt too wide) in paragraph at lines 935--935
+[][]\OT1/cmtt/m/n/9 IlluminaIDs[] []<-[] []AnnotationDbi[][]::[][]select[][](il
+luminaHumanv4.db, PROBES.GSE42656,[] []c[][]([][]"SYMBOL"[][],[][]"PROBEID"[][]
+,[] []"ENTREZID"[][],[] []"GENENAME"[][]))[][] 
+ []
+
+
+Overfull \hbox (59.43883pt too wide) in paragraph at lines 936--936
+[][]\OT1/cmtt/m/n/9 AffyIDs[] []<-[] []AnnotationDbi[][]::[][]select[][](hgu133
+plus2.db, PROBES.GSE12907,[] []c[][]([][]"SYMBOL"[][],[][]"PROBEID"[][],[] []"E
+NTREZID"[][],[] []"GENENAME"[][]))[][] 
+ []
+
+
+Overfull \hbox (16.91432pt too wide) in paragraph at lines 960--960
+[][]\OT1/cmtt/m/n/9 AffyIDs[] []<-[] []AnnotationDbi[][]::[][]select[][](hgu133
+plus2.db, PROBES.GSE12907,[]  []c[][]([][]"SYMBOL"[][],[] []"ENTREZID"[][],[] [
+]"GENENAME"[][]))[][] 
+ []
+
+[18]
+Package color Info: Redefining color shadecolor on input line 984.
+ [19] <figure/unnamed-chunk-23-1.pdf, id=104, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-23-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-23-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-23-1.pdf used on input line 1025.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1025--1026
+[][] 
+ []
+
+<figure/unnamed-chunk-23-2.pdf, id=105, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-23-2.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-23-2.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-23-2.pdf used on input line 1033.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1033--1034
+[][] 
+ []
+
+[20 <./figure/unnamed-chunk-23-1.pdf>] [21 <./figure/unnamed-chunk-23-2.pdf>]
+<figure/unnamed-chunk-23-3.pdf, id=122, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-23-3.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-23-3.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-23-3.pdf used on input line 1106.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1106--1107
+[][] 
+ []
+
+
+Overfull \vbox (1.80128pt too high) detected at line 1113
+ []
+
+[22 <./figure/unnamed-chunk-23-3.pdf>]
+<figure/unnamed-chunk-23-4.pdf, id=131, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-23-4.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-23-4.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-23-4.pdf used on input line 1114.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1114--1115
+[][] 
+ []
+
+<figure/unnamed-chunk-23-5.pdf, id=132, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-23-5.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-23-5.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-23-5.pdf used on input line 1127.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1127--1128
+[][] 
+ []
+
+[23 <./figure/unnamed-chunk-23-4.pdf> <./figure/unnamed-chunk-23-5.pdf>]
+Package color Info: Redefining color shadecolor on input line 1142.
+
+<figure/unnamed-chunk-24-1.pdf, id=146, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-24-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-24-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-24-1.pdf used on input line 1191.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1191--1192
+[][] 
+ []
+
+[24] [25 <./figure/unnamed-chunk-24-1.pdf>] [26]
+<figure/unnamed-chunk-24-2.pdf, id=163, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-24-2.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-24-2.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-24-2.pdf used on input line 1321.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1321--1322
+[][] 
+ []
+
+[27 <./figure/unnamed-chunk-24-2.pdf>]
+Package color Info: Redefining color shadecolor on input line 1333.
+ [28]
+<figure/unnamed-chunk-25-1.pdf, id=175, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-25-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-25-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-25-1.pdf used on input line 1413.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1413--1414
+[][] 
+ []
+
+Package color Info: Redefining color shadecolor on input line 1419.
+[29 <./figure/unnamed-chunk-25-1.pdf>]
+Overfull \vbox (1.56999pt too high) detected at line 1583
+ []
+
+[30] [31]
+Package color Info: Redefining color shadecolor on input line 1596.
+ [32]
+Overfull \hbox (4.30235pt too wide) in paragraph at lines 1605--1605
+[][]\OT1/cmtt/m/n/9 de.pwf[] []=[] []nullp[][](gene.vector,[] []genome[][]=[][]
+^^Mmm9^^M[][],[] []id[][]=[][]^^MgeneSymbol^^M[][],[] []plot.fit[][]=[][]FALSE[
+][])[]  []\OT1/cmtt/m/it/9 #prob weighting function[][] 
+ []
+
+[33]
+Underfull \vbox (badness 10000) detected at line 1730
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1730
+ []
+
+[34] [35]
+Package color Info: Redefining color shadecolor on input line 1748.
+Package color Info: Redefining color shadecolor on input line 1779.
+
+Overfull \hbox (2.73949pt too wide) in paragraph at lines 1825--1825
+[]  []\OT1/cmtt/m/n/9 mutate[][]([][]sample2[] []=[] []ifelse[][](sample[] []==
+[] []"FFY"[][],[] []"control optic nerve"[][],[] []"optic glioma-bearing nerve"
+[][]))[] []%>%[][] 
+ []
+
+
+Overfull \hbox (59.43883pt too wide) in paragraph at lines 1827--1827
+[]                          []\OT1/cmtt/m/n/9 ifelse[][](normdataplot[][]$[][]d
+ata6wk[] []<[] []262.2[][],[] []-[][]2[][],[] []ifelse[][](normdataplot[][]$[][
+]data6wk[] []<[] []265[][],[] []2[][],[] []0[][])),[][]0[][]))[][] 
+ []
+
+[36] <figure/unnamed-chunk-29-1.pdf, id=207, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-29-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-29-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-29-1.pdf used on input line 1839.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1839--1840
+[][] 
+ []
+
+[37 <./figure/unnamed-chunk-29-1.pdf>]
+<figure/unnamed-chunk-29-2.pdf, id=217, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-29-2.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-29-2.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-29-2.pdf used on input line 1909.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 1909--1910
+[][] 
+ []
+
+[38]
+Package color Info: Redefining color shadecolor on input line 1916.
+ [39 <./figure/unnamed-chunk-29-2.pdf>]
+Package color Info: Redefining color shadecolor on input line 1958.
+
+<figure/unnamed-chunk-31-1.pdf, id=229, 505.89pt x 252.945pt>
+File: figure/unnamed-chunk-31-1.pdf Graphic file (type pdf)
+
+<use figure/unnamed-chunk-31-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-31-1.pdf used on input line 2008.
+
+(pdftex.def)             Requested size: 469.75502pt x 234.88133pt.
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 2008--2009
+[][] 
+ []
+
+[40] [41 <./figure/unnamed-chunk-31-1.pdf>] (./CompleteETV5Analysis.aux) ) 
+Here is how much of TeX's memory you used:
+ 1895 strings out of 492995
+ 28934 string characters out of 6132704
+ 147118 words of memory out of 5000000
+ 5397 multiletter control sequences out of 15000+600000
+ 10149 words of font info for 38 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 39i,7n,25p,1140b,308s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr
+/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/
+local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/l
+ocal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/lo
+cal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr/lo
+cal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/loc
+al/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local
+/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/t
+exlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/tex
+live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texli
+ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive
+/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/20
+17/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2017/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2017/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2017/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2017/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2017/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2017/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2017/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
+Output written on CompleteETV5Analysis.pdf (41 pages, 3055008 bytes).
+PDF statistics:
+ 307 PDF objects out of 1000 (max. 8388607)
+ 211 compressed objects within 3 object streams
+ 0 named destinations out of 1000 (max. 500000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
+
